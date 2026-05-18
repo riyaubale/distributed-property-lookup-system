@@ -1,0 +1,17 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install gRPC tools for compilation
+RUN pip install grpcio grpcio-tools
+
+# Copy proto file and compile
+COPY property_lookup.proto .
+RUN python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. property_lookup.proto
+
+# Copy dataset and server code
+COPY dataset.py .
+COPY addresses.csv.gz .
+
+# Run the server
+CMD ["python", "dataset.py"]

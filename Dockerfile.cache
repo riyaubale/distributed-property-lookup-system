@@ -1,0 +1,19 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install Flask and gRPC
+RUN pip install flask grpcio grpcio-tools
+
+# Copy code and proto
+COPY cache.py .
+COPY property_lookup.proto .
+
+# Compile proto
+RUN python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. property_lookup.proto
+
+# Expose Flask HTTP port
+EXPOSE 8080
+
+# Run cache server
+CMD ["python", "cache.py"]
